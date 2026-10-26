@@ -1,39 +1,68 @@
 # PID Control Systems Simulator
 
 ### Feedback Control Analysis | P, PI & PID Controllers
-### CPE - Marian University
 
+**Computer Engineering | Marian University**
 
 ## Project Overview
 
 This project explores feedback control systems through a Python-based simulation of proportional (P), proportional-integral (PI), and proportional-integral-derivative (PID) controllers.
 
-Inspired by my Control Systems coursework, this simulation investigates how controller gains influence system response, including rise time, overshoot, settling time, and steady-state error.
+Inspired by concepts from my Control Systems coursework, this simulation investigates how different controller configurations influence system behavior, including rise time, overshoot, settling time, and steady-state error.
 
 The objective is to connect mathematical modeling and control theory with practical software-based engineering analysis.
 
+## Project Objectives
+
+- Implement P, PI, and PID controllers using Python.
+- Simulate the response of a first-order dynamic system.
+- Compare controller configurations and their performance.
+- Analyze transient and steady-state characteristics.
+- Visualize system responses using Matplotlib.
+- Explore the effects of controller tuning on stability and accuracy.
+
 ## Mathematical Model
 
-The simulation uses a simplified first-order plant:
+The simulation uses a first-order dynamic system described by:
 
-\[
-\tau\frac{dy(t)}{dt}+y(t)=Ku(t)
-\]
+$$
+\tau \frac{dy(t)}{dt} + y(t) = K u(t)
+$$
 
 Where:
 
-- \(\tau=2\) seconds is the plant time constant.
-- \(K=1\) is the plant gain.
-- \(u(t)\) is the control input.
-- \(y(t)\) is the system output.
+- **τ = 2 seconds** — Plant time constant
+- **K = 1** — Plant gain
+- **u(t)** — Control input
+- **y(t)** — System output
 
-The PID control law is:
+The corresponding transfer function is:
 
-\[
-u(t)=K_pe(t)+K_i\int e(t)\,dt+K_d\frac{de(t)}{dt}
-\]
+$$
+G(s) = \frac{K}{\tau s + 1}
+$$
+
+### PID Control Equation
+
+The PID controller is represented by:
+
+$$
+u(t) = K_p e(t) + K_i \int_0^t e(\xi)\,d\xi
++ K_d \frac{de(t)}{dt}
+$$
+
+Where:
+
+- **Kp** — Proportional gain
+- **Ki** — Integral gain
+- **Kd** — Derivative gain
+- **e(t)** — Difference between the desired setpoint and measured output
+
+Each controller uses different combinations of these terms to regulate system behavior.
 
 ## Controller Configurations
+
+The following controller gains are implemented in the simulation:
 
 | Controller | Kp | Ki | Kd |
 |---|---:|---:|---:|
@@ -41,62 +70,216 @@ u(t)=K_pe(t)+K_i\int e(t)\,dt+K_d\frac{de(t)}{dt}
 | PI | 2.0 | 1.0 | 0.0 |
 | PID | 3.0 | 1.5 | 0.2 |
 
-## Technologies
+These configurations allow comparison of how proportional, integral, and derivative actions affect the response.
 
+## Technologies Used
+
+**Programming Language**
 - Python
+
+**Libraries**
 - NumPy
 - Matplotlib
+
+**Engineering Concepts**
+- Feedback Control Systems
+- Differential Equations
+- Transfer Functions
 - Numerical Integration
-- Feedback Control Theory
+- Transient Response Analysis
+- Controller Tuning
+- System Stability
+
+## Simulation Methodology
+
+The simulation uses a numerical approximation of the first-order plant dynamics.
+
+### 1. System Initialization
+
+The simulation defines:
+
+- Sampling interval: 0.01 seconds
+- Simulation duration: 20 seconds
+- Reference setpoint: 1.0
+- Plant time constant: 2 seconds
+- Plant gain: 1.0
+
+### 2. Error Calculation
+
+At each time step, the controller calculates the difference between the reference and the current output:
+
+$$
+e(t) = r(t) - y(t)
+$$
+
+### 3. Controller Output
+
+The control signal is calculated using the selected P, PI, or PID gains.
+
+### 4. System Response
+
+The simulated plant output is updated using forward Euler numerical integration.
+
+### 5. Performance Evaluation
+
+The resulting output is analyzed to estimate overshoot, time to reach 90% of the setpoint, settling time, and final-time steady-state error.
 
 ## Simulation Results
 
-The program compares the three controllers using a unit-step reference input.
+The program compares the step responses of P, PI, and PID controllers using the same first-order plant.
 
-![P, PI, and PID Step Response](pid_response.png)
+### Controller Response Comparison
 
-The simulation calculates:
+![P, PI, and PID Controller Step Response](pid_response.png)
 
-- Percentage overshoot
-- Time to reach 90% of the setpoint
-- Settling time within a 2% tolerance
-- Steady-state error estimated at the end of the simulation
+*Figure 1: Simulated step responses comparing P, PI, and PID controllers.*
+
+**Note:** The graph will appear once `pid_response.png` has been generated and uploaded to this repository.
+
+### Performance Metrics
+
+The simulation calculates the following metrics:
+
+**Percentage Overshoot**
+
+$$
+M_p = \frac{y_{\max}-r}{r}\times100\%
+$$
+
+Overshoot is reported as zero if the output does not exceed the setpoint.
+
+**Time to Reach 90%**
+
+The first time at which the simulated output reaches 90% of the desired setpoint.
+
+**Settling Time**
+
+The time after which the response remains within 2% of the desired setpoint for the rest of the simulation.
+
+**Final-Time Error**
+
+$$
+e_f = |r-y(t_f)|
+$$
+
+Where `t_f` represents the final simulation time.
+
+The final-time error is an approximation of steady-state behavior, not proof of the asymptotic steady-state error.
 
 ## Engineering Analysis
 
-The proportional controller responds to the reference input but generally retains steady-state error for the modeled plant.
+### Proportional (P) Controller
 
-Adding integral control allows the controller to eliminate steady-state error under suitable stable operating conditions.
+The proportional controller responds to the difference between the desired reference and actual system output.
 
-Derivative control responds to changes in error and can improve transient performance when appropriately tuned. Its effects depend on the selected gains and plant dynamics.
+Increasing proportional gain generally improves response speed for the modeled first-order plant. However, proportional-only control retains a nonzero steady-state error for a constant step input.
 
-The purpose of comparing these configurations is to evaluate the tradeoffs between response speed, accuracy, and stability.
+### Proportional-Integral (PI) Controller
+
+The integral term accumulates error over time and adjusts the controller output to reduce persistent deviations from the reference.
+
+For a stable closed-loop system, integral action can eliminate steady-state error for a constant reference input.
+
+However, excessive integral gain may increase overshoot or produce undesirable oscillations.
+
+### Proportional-Integral-Derivative (PID) Controller
+
+The PID controller combines proportional, integral, and derivative actions.
+
+The derivative term responds to changes in error and can improve transient behavior when appropriately tuned.
+
+The effectiveness of derivative action depends on the system dynamics, selected gains, and implementation.
+
+### Engineering Tradeoffs
+
+Controller design involves balancing several performance objectives:
+
+- Response speed
+- Overshoot
+- Settling time
+- Steady-state accuracy
+- Stability
+- Control effort
+
+The fastest controller is not necessarily the best controller. Appropriate tuning depends on the requirements and limitations of the application.
 
 ## Running the Project
 
-Install the required Python libraries:
+### Requirements
 
-`pip install -r requirements.txt`
+- Python 3.9 or newer
+- NumPy
+- Matplotlib
 
-Execute the simulation:
+### Installation
 
-`python main.py`
+Install the required dependencies:
 
-The program generates a step-response plot and saves it as `pid_response.png`.
+```bash
+pip install -r requirements.txt
+```
+
+### Execution
+
+Run the simulation:
+
+```bash
+python main.py
+```
+
+The program prints the calculated performance metrics and generates a comparison graph.
+
+The figure is saved as:
+
+`pid_response.png`
+
+## Applications
+
+The concepts demonstrated in this project are relevant to:
+
+- Robotics and Motion Control
+- Industrial Automation
+- Motor Speed Regulation
+- Embedded Control Systems
+- Manufacturing Equipment
+- Process Control
+- Mechatronic Systems
 
 ## Development Roadmap
 
-- [x] Implement P, PI, and PID controllers
-- [x] Model first-order plant dynamics
-- [x] Calculate response performance metrics
-- [x] Generate step-response visualizations
-- [ ] Experiment with additional controller gains
-- [ ] Model second-order dynamic systems
-- [ ] Investigate disturbance rejection
-- [ ] Explore physical hardware integration
+- [x] Implement P, PI, and PID control algorithms.
+- [x] Simulate first-order plant dynamics.
+- [x] Implement numerical integration.
+- [x] Calculate response performance metrics.
+- [x] Generate step-response visualization code.
+- [ ] Compare additional controller gain configurations.
+- [ ] Implement second-order plant models.
+- [ ] Investigate external disturbances.
+- [ ] Add actuator saturation and anti-windup.
+- [ ] Explore hardware-based control applications.
 
-## Limitations
+## Project Limitations
 
-This is an educational simulation based on a simplified first-order model. It does not include actuator saturation, sensor noise, or experimental hardware validation.
+This project is an educational simulation using a simplified mathematical model.
 
-The reported steady-state error is an estimate at the simulation's final time rather than a proof of asymptotic behavior.
+The current implementation does not include:
+
+- Physical hardware measurements
+- Sensor noise
+- Actuator saturation
+- Integral anti-windup
+- Experimental validation
+
+The numerical simulation uses a fixed time step, and its results may vary with the integration method and controller parameters.
+
+## Future Development
+
+Future work could expand this simulation to second-order systems, compare different numerical integration methods, and evaluate how disturbances affect controller performance.
+
+Another potential improvement is exploring how the simulated control algorithms could be implemented in embedded hardware.
+
+## Academic Context
+
+This project was created as a portfolio example inspired by topics studied in my Computer Engineering Control Systems coursework at Marian University.
+
+It demonstrates a preliminary software implementation of feedback control concepts and provides a foundation for additional experiments and engineering analysis.
